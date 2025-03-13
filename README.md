@@ -1,5 +1,14 @@
-# Vue 3 + Vite
+# 技术博客系统
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+一个使用 Vue 3 + Element Plus 开发的现代化技术博客系统，支持 Markdown 写作。
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## 功能特点
+
+- 💡 基于 Vue 3 + Vite 构建
+- 🎨 使用 Element Plus UI 框架
+- 📝 支持 Markdown 编辑和预览
+- 🖼️ 支持图片上传和压缩
+- 🏷️ 文章分类管理
+- 🔍 全文搜索功能
+- 💾 数据本地持久化
+- 📱 响应式设计
