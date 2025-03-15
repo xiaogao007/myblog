@@ -91,6 +91,19 @@
                     </el-button>
                   </el-tooltip>
                 </el-button-group>
+
+                <el-button-group>
+                  <el-tooltip content="导入Markdown" placement="top">
+                    <el-button @click="triggerFileInput">Import</el-button>
+                  </el-tooltip>
+                  <input 
+                    type="file" 
+                    ref="fileInput" 
+                    accept=".md" 
+                    style="display: none" 
+                    @change="handleFileChange"
+                  />
+                </el-button-group>
               </div>
               <el-input
                 v-model="postForm.content"
@@ -209,6 +222,8 @@ const renderedContent = ref('')
 const editorRef = ref(null)
 const showImageUploader = ref(false)
 
+const fileInput = ref(null)
+
 const handleContentChange = () => {
   renderedContent.value = md.render(postForm.value.content)
 }
@@ -283,6 +298,22 @@ const handleImageInsert = (base64Url) => {
   insertMarkdown(imageMarkdown)
   showImageUploader.value = false
 }
+
+const triggerFileInput = () => {
+  fileInput.value.click()
+}
+
+const handleFileChange = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      postForm.value.content = e.target.result
+      handleContentChange()
+    }
+    reader.readAsText(file)
+  }
+}
 </script>
 
 <style scoped>
@@ -301,6 +332,7 @@ const handleImageInsert = (base64Url) => {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100%; /* 确保高度跟随父元素 */
 }
 
 /* 让表单填满剩余空间 */
@@ -309,20 +341,23 @@ const handleImageInsert = (base64Url) => {
   display: flex;
   flex-direction: column;
   padding: 20px 30px; /* 增加内边距 */
+  height: 100%; /* 确保高度跟随父元素 */
 }
 
 .edit-card :deep(.el-form) {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100%; /* 确保高度跟随父元素 */
+  overflow: hidden; /* 防止内容溢出 */
 }
 
-/* 让编辑器区域自动填充剩余空间 */
 .edit-card :deep(.el-form-item.is-required) {
   flex: 1;
   display: flex;
   flex-direction: column;
   margin-bottom: 0;
+  overflow: hidden; /* 防止内容溢出 */
 }
 
 .editor-container {
@@ -330,6 +365,7 @@ const handleImageInsert = (base64Url) => {
   display: flex;
   gap: 20px;
   min-height: 0; /* 防止溢出 */
+  overflow: hidden; /* 确保内容不溢出 */
 }
 
 .editor-wrapper,
@@ -338,6 +374,8 @@ const handleImageInsert = (base64Url) => {
   display: flex;
   flex-direction: column;
   min-height: 0; /* 防止溢出 */
+  overflow-y: auto; /* 允许垂直滚动 */
+  overflow-x: hidden; /* 隐藏水平滚动条 */
 }
 
 /* 调整编辑器工具栏 */
@@ -377,6 +415,8 @@ const handleImageInsert = (base64Url) => {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   resize: none; /* 禁用手动调整大小 */
+  overflow-y: auto; /* 允许垂直滚动 */
+  overflow-x: hidden; /* 隐藏水平滚动条 */
 }
 
 /* 调整预览区域 */
@@ -465,12 +505,13 @@ const handleImageInsert = (base64Url) => {
   }
   
   .editor-container {
-    flex-direction: column;
+    flex-direction: column; /* 小屏幕上垂直排列 */
   }
   
   .editor-wrapper,
   .preview-wrapper {
     width: 100%;
+    max-height: 50vh; /* 限制高度，防止溢出 */
   }
 }
 </style> 

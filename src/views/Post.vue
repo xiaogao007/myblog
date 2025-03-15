@@ -1,12 +1,17 @@
 <template>
   <div class="post-detail">
     <el-card>
-      <h1>{{ post.title }}</h1>
-      <div class="post-meta">
-        <el-tag size="small">{{ post.category }}</el-tag>
-        <span class="date">{{ post.date }}</span>
+      <div v-if="post">
+        <h1>{{ post.title }}</h1>
+        <div class="post-meta">
+          <el-tag size="small">{{ post.category }}</el-tag>
+          <span class="date">{{ post.date }}</span>
+        </div>
+        <div class="content" v-html="renderedContent"></div>
       </div>
-      <div class="content" v-html="renderedContent"></div>
+      <div v-else>
+        <p>加载中...</p>
+      </div>
     </el-card>
 
     <el-card class="comment-section">
@@ -108,13 +113,16 @@ const postStore = usePostStore()
 const post = ref(null)
 
 onMounted(() => {
-  post.value = postStore.getPost(route.params.id)
-  if (!post.value) {
-    ElMessage.error('文章不存在')
-    router.push('/')
-    return
+  const postId = route.params.id
+  console.log('当前路由参数中的 postId:', postId)
+  console.log('当前文章列表:', postStore.posts)
+
+  post.value = postStore.posts.find(p => p.id == postId)
+  if (post.value) {
+    renderedContent.value = md.render(post.value.content)
+  } else {
+    console.error('文章不存在')
   }
-  renderedContent.value = md.render(post.value.content)
 })
 
 const renderedContent = ref('')

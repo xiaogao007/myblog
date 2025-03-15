@@ -5,7 +5,7 @@
         <el-menu mode="horizontal" router class="kawaii-menu">
           <div class="logo">
             <KawaiiLogo />
-            <span class="logo-text">我的世界</span>
+            <span class="logo-text">Gao's Blog</span>
           </div>
           <el-menu-item index="/">首页</el-menu-item>
           <el-menu-item index="/about">关于</el-menu-item>
@@ -33,13 +33,20 @@ import KawaiiLogo from './components/KawaiiLogo.vue'
   height: 100%;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* 防止全局滚动条 */
+}
+
 /* 设置基础布局 */
 .app-container {
-  min-height: 100vh;
+  min-height: calc(100vh - 20px);
   display: flex;
   flex-direction: column;
   background: #F1F8FF;
   background-image: url('@/assets/bg-pattern.png');
+  overflow: hidden; /* 防止容器滚动条 */
 }
 
 .kawaii-header {
@@ -54,9 +61,10 @@ import KawaiiLogo from './components/KawaiiLogo.vue'
 
 .kawaii-main {
   flex: 1;
-  padding: 20px;
+  padding: 0 20px;
   overflow-y: auto;
-  height: calc(100vh - 120px); /* 减去头部和底部的高度 */
+  height:100%; /* 减去头部和底部的高度 */
+  box-sizing: border-box; /* 确保填充和边框不会影响总高度 */
 }
 
 .kawaii-footer {

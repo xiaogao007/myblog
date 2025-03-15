@@ -117,29 +117,31 @@ const handleSearch = debounce(() => {
 
 .kawaii-input :deep(.el-input__inner) {
   border-radius: 20px;
-  border: 2px solid #4FC3F7;
+  border: 2px solid #3A9AD9;
   transition: all 0.3s ease;
 }
 
 .kawaii-input :deep(.el-input__inner:focus) {
-  border-color: #0288D1;
+  border-color: #007BB5;
   box-shadow: 0 0 10px rgba(79, 195, 247, 0.2);
 }
-
+.post-item{
+  margin-bottom: 20px;
+}
 .kawaii-card {
   border-radius: 15px;
   border: none;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(79, 195, 247, 0.15);
+  box-shadow: 0 4px 12px rgba(58, 154, 217, 0.15);
 }
 
 .kawaii-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(79, 195, 247, 0.2);
+  box-shadow: 0 8px 16px rgba(58, 154, 217, 0.2);
 }
 
 .post-title {
-  color: #4FC3F7;
+  color: #3A9AD9;
   text-decoration: none;
   font-size: 1.4em;
   font-weight: bold;
@@ -147,26 +149,26 @@ const handleSearch = debounce(() => {
 }
 
 .post-title:hover {
-  color: #0288D1;
+  color: #007BB5;
 }
 
 .kawaii-tag {
   background: #F1F8FF;
-  border-color: #4FC3F7;
-  color: #4FC3F7;
+  border-color: #3A9AD9;
+  color: #3A9AD9;
   border-radius: 12px;
   padding: 0 12px;
   transition: all 0.3s ease;
 }
 
 .kawaii-tag:hover {
-  background: #4FC3F7;
+  background: #3A9AD9;
   color: white;
 }
 
 .post-meta {
   margin: 12px 0;
-  color: #4FC3F7;
+  color: #3A9AD9;
 }
 
 .date {
@@ -201,6 +203,7 @@ const handleSearch = debounce(() => {
 
 .search-input {
   width: 100%;
+  margin-top: 20px;
 }
 
 .search-input :deep(.el-input__wrapper) {
@@ -220,13 +223,14 @@ const handleSearch = debounce(() => {
 
 .new-post-btn {
   width: 100%;
-  background-color: #4FC3F7;
-  border-color: #4FC3F7;
+  margin-top: 20px;
+  background-color: #3A9AD9;
+  border-color: #3A9AD9;
 }
 
 .new-post-btn:hover {
-  background-color: #0288D1;
-  border-color: #0288D1;
+  background-color: #007BB5;
+  border-color: #007BB5;
 }
 
 img, video {
