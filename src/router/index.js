@@ -22,8 +22,13 @@ const router = createRouter({
     {
       path: '/edit/:id',
       component: () => import('../views/EditPost.vue')
+    },
+    {
+      path: '/admin',
+      name: 'Admin',
+      component: () => import('../views/Admin.vue')
     }
   ]
 })
 
-export default router 
+export default router

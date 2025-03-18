@@ -215,176 +215,40 @@ const replyToComment = (comment) => {
 .post-detail {
   max-width: 800px;
   margin: 0 auto;
+  padding: 20px;
+  background: #F1F8FF;
+  background-image: url('@/assets/bg-pattern.png');
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(79, 195, 247, 0.1);
 }
 
 .post-meta {
   margin: 20px 0;
+  color: #666;
 }
 
 .date {
   margin-left: 10px;
-  color: #666;
 }
 
 .content {
   line-height: 1.8;
-}
-
-:deep(.content) {
-  font-size: 16px;
-  line-height: 1.8;
   color: #2c3e50;
-}
-
-:deep(.content h1) {
-  font-size: 2em;
-  margin: 1.2em 0 0.8em;
-  padding-bottom: 0.3em;
-  border-bottom: 1px solid #eaecef;
-}
-
-:deep(.content h2) {
-  font-size: 1.65em;
-  margin: 1.2em 0 0.8em;
-  padding-bottom: 0.3em;
-  border-bottom: 1px solid #eaecef;
-}
-
-:deep(.content h3) {
-  font-size: 1.35em;
-  margin: 1em 0 0.8em;
-}
-
-:deep(.content h4) {
-  font-size: 1.15em;
-  margin: 1em 0 0.8em;
-}
-
-:deep(.content p) {
-  margin: 1em 0;
-  line-height: 1.8;
-}
-
-:deep(.content ul),
-:deep(.content ol) {
-  padding-left: 1.2em;
-  margin: 1em 0;
-}
-
-:deep(.content li) {
-  margin: 0.5em 0;
-  line-height: 1.7;
-}
-
-:deep(.content li > p) {
-  margin: 0.5em 0;
-}
-
-:deep(.content blockquote) {
-  margin: 1em 0;
-  padding: 0.5em 1.2em;
-  border-left: 4px solid #42b983;
-  background-color: #f8f8f8;
-  color: #666;
-}
-
-:deep(.content blockquote p) {
-  margin: 0.5em 0;
-}
-
-:deep(.content pre) {
-  margin: 1em 0;
-  padding: 1em;
-  border-radius: 6px;
-  background-color: #f6f8fa;
-  overflow: auto;
-}
-
-:deep(.content code) {
-  font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
-  font-size: 0.9em;
-  padding: 0.2em 0.4em;
-  border-radius: 3px;
-  background-color: #f6f8fa;
-}
-
-:deep(.content pre code) {
-  padding: 0;
-  background-color: transparent;
-}
-
-:deep(.content table) {
-  width: 100%;
-  margin: 1em 0;
-  border-collapse: collapse;
-}
-
-:deep(.content th),
-:deep(.content td) {
-  padding: 0.6em 1em;
-  border: 1px solid #dfe2e5;
-}
-
-:deep(.content th) {
-  background-color: #f6f8fa;
-  font-weight: 600;
-}
-
-:deep(.content tr:nth-child(2n)) {
-  background-color: #fafafa;
-}
-
-:deep(.content hr) {
-  height: 1px;
-  margin: 2em 0;
-  border: none;
-  background-color: #eaecef;
-}
-
-:deep(.content a) {
-  color: #3eaf7c;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-:deep(.content a:hover) {
-  text-decoration: underline;
-}
-
-:deep(.content img) {
-  max-width: 100%;
-  margin: 1em 0;
-  border-radius: 4px;
-}
-
-:deep(.content p code),
-:deep(.content li code) {
-  color: #476582;
-  padding: 0.25rem 0.5rem;
-  margin: 0 0.2em;
-  font-size: 0.85em;
-  border-radius: 3px;
-  background-color: rgba(27,31,35,0.05);
-}
-
-:deep(.content pre::before) {
-  content: attr(data-lang);
-  position: absolute;
-  top: 0.5em;
-  right: 1em;
-  color: #999;
-  font-size: 0.75em;
-  text-transform: uppercase;
 }
 
 .comment-section {
   margin-top: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(79, 195, 247, 0.1);
 }
 
 .comment-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .comment-form {
@@ -393,6 +257,8 @@ const replyToComment = (comment) => {
 
 .comment-input {
   margin-bottom: 15px;
+  border-radius: 20px;
+  border: 2px solid #4FC3F7;
 }
 
 .comment-form-footer {

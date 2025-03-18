@@ -39,85 +39,7 @@
         </el-form-item>
 
         <el-form-item label="文章内容 (Markdown)">
-          <div class="editor-container">
-            <div class="editor-wrapper">
-              <div class="editor-toolbar">
-                <el-button-group>
-                  <el-tooltip content="标题" placement="top">
-                    <el-button @click="insertMarkdown('### ')">H</el-button>
-                  </el-tooltip>
-                  <el-tooltip content="粗体" placement="top">
-                    <el-button @click="insertMarkdown('**粗体**')">B</el-button>
-                  </el-tooltip>
-                  <el-tooltip content="斜体" placement="top">
-                    <el-button @click="insertMarkdown('*斜体*')">I</el-button>
-                  </el-tooltip>
-                </el-button-group>
-
-                <el-button-group>
-                  <el-tooltip content="引用" placement="top">
-                    <el-button @click="insertMarkdown('\n> ')">Quote</el-button>
-                  </el-tooltip>
-                  <el-tooltip content="代码块" placement="top">
-                    <el-button @click="insertMarkdown('\n```js\n代码\n```\n')">Code</el-button>
-                  </el-tooltip>
-                  <el-tooltip content="分割线" placement="top">
-                    <el-button @click="insertMarkdown('\n---\n')">HR</el-button>
-                  </el-tooltip>
-                </el-button-group>
-
-                <el-button-group>
-                  <el-tooltip content="无序列表" placement="top">
-                    <el-button @click="insertMarkdown('\n- ')">UL</el-button>
-                  </el-tooltip>
-                  <el-tooltip content="有序列表" placement="top">
-                    <el-button @click="insertMarkdown('\n1. ')">OL</el-button>
-                  </el-tooltip>
-                  <el-tooltip content="任务列表" placement="top">
-                    <el-button @click="insertMarkdown('\n- [ ] ')">Task</el-button>
-                  </el-tooltip>
-                </el-button-group>
-
-                <el-button-group>
-                  <el-tooltip content="链接" placement="top">
-                    <el-button @click="insertMarkdown('[链接文字](url)')">Link</el-button>
-                  </el-tooltip>
-                  <el-tooltip content="图片" placement="top">
-                    <el-button @click="showImageUploader = true">Image</el-button>
-                  </el-tooltip>
-                  <el-tooltip content="表格" placement="top">
-                    <el-button @click="insertMarkdown('\n| 表头 | 表头 |\n| --- | --- |\n| 内容 | 内容 |')">
-                      Table
-                    </el-button>
-                  </el-tooltip>
-                </el-button-group>
-
-                <el-button-group>
-                  <el-tooltip content="导入Markdown" placement="top">
-                    <el-button @click="triggerFileInput">Import</el-button>
-                  </el-tooltip>
-                  <input 
-                    type="file" 
-                    ref="fileInput" 
-                    accept=".md" 
-                    style="display: none" 
-                    @change="handleFileChange"
-                  />
-                </el-button-group>
-              </div>
-              <el-input
-                v-model="postForm.content"
-                type="textarea"
-                :rows="15"
-                placeholder="使用 Markdown 编写文章内容..."
-                @input="handleContentChange"
-                ref="editorRef"
-              />
-            </div>
-            <div class="preview-wrapper">
-              <div class="preview-content markdown-body" v-html="renderedContent"></div>
-            </div>
-          </div>
+          <div style="width: 100%; height: 600px;" id="vditor"></div>
         </el-form-item>
 
         <el-form-item>
@@ -164,36 +86,23 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+// 添加 request 相关导入
+import { get, post, put } from '../utils/request'
+
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { usePostStore } from '../stores/post'
-import MarkdownIt from 'markdown-it'
-import hljs from 'highlight.js'
+import Vditor from 'vditor'
 import ImageUploader from '../components/ImageUploader.vue'
+import 'vditor/dist/index.css'
 
 const router = useRouter()
 const route = useRoute()
 const postStore = usePostStore()
 
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  typographer: true,
-  highlight: function (str, lang) {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return hljs.highlight(str, { language: lang, ignoreIllegals: true }).value
-      } catch (__) {}
-    }
-    return ''
-  }
-})
-
-// 判断是否为编辑模式
 const isEdit = computed(() => !!route.params.id)
 
-// 如果是编辑模式，加载文章数据
 const postForm = ref({
   title: '',
   category: '',
@@ -210,23 +119,36 @@ if (isEdit.value) {
   }
 }
 
-// 使用 store 中的分类数据
 const categories = computed(() => postStore.categories)
 
 const submitting = ref(false)
 const showAddCategory = ref(false)
 const newCategory = ref('')
 
-const renderedContent = ref('')
-
-const editorRef = ref(null)
 const showImageUploader = ref(false)
 
-const fileInput = ref(null)
+let vditorInstance
 
-const handleContentChange = () => {
-  renderedContent.value = md.render(postForm.value.content)
-}
+onMounted(() => {
+  vditorInstance = new Vditor('vditor', {
+    height: 600,
+    toolbarConfig: {
+      pin: true,
+    },
+    cache: {
+      id: 'vditor',
+    },
+    preview: {
+      markdown: {
+        toc: true,
+        mark: true,
+      },
+    },
+    input: () => {
+      postForm.value.content = vditorInstance.getValue()
+    }
+  })
+})
 
 const handleAddCategory = () => {
   if (!newCategory.value.trim()) {
@@ -248,6 +170,7 @@ const handleSubmit = async () => {
     ElMessage.warning('请选择文章分类')
     return
   }
+  alert(postForm.value.content)
   if (!postForm.value.content.trim()) {
     ElMessage.warning('请输入文章内容')
     return
@@ -255,15 +178,23 @@ const handleSubmit = async () => {
 
   submitting.value = true
   try {
+    const requestData = {
+      title: postForm.value.title.trim(),
+      content: postForm.value.content.trim(),
+      category: postForm.value.category,
+      date: new Date().toISOString().split('T')[0]
+    }
+
     if (isEdit.value) {
-      postStore.updatePost(Number(route.params.id), postForm.value)
+      await put(`/articles/${route.params.id}`, requestData)
     } else {
-      postStore.addPost(postForm.value)
+      await post('/articles', requestData)
     }
     ElMessage.success(isEdit.value ? '文章更新成功' : '文章发布成功')
     router.push('/')
   } catch (error) {
     ElMessage.error(isEdit.value ? '更新失败' : '发布失败')
+    console.error('Error:', error)
   } finally {
     submitting.value = false
   }
@@ -273,56 +204,20 @@ const handleCancel = () => {
   router.back()
 }
 
-// 插入 Markdown 语法
-const insertMarkdown = (text) => {
-  const textarea = editorRef.value.$el.querySelector('textarea')
-  const start = textarea.selectionStart
-  const end = textarea.selectionEnd
-  const content = postForm.value.content
-  
-  postForm.value.content = content.substring(0, start) + text + content.substring(end)
-  
-  // 更新预览
-  handleContentChange()
-  
-  // 设置光标位置
-  nextTick(() => {
-    textarea.focus()
-    textarea.setSelectionRange(start + text.length, start + text.length)
-  })
-}
-
-// 处理图片插入
 const handleImageInsert = (base64Url) => {
   const imageMarkdown = `![image](${base64Url})`
-  insertMarkdown(imageMarkdown)
+  vditorInstance.insertValue(imageMarkdown)
   showImageUploader.value = false
-}
-
-const triggerFileInput = () => {
-  fileInput.value.click()
-}
-
-const handleFileChange = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      postForm.value.content = e.target.result
-      handleContentChange()
-    }
-    reader.readAsText(file)
-  }
 }
 </script>
 
 <style scoped>
 /* 调整整体布局 */
 .edit-post {
-  max-width: 1600px; /* 增加最大宽度 */
+  max-width: 1600px;
   margin: 0 auto;
   padding: 20px;
-  height: calc(100vh - 140px); /* 减去头部和底部的高度，以及padding */
+  height: calc(100vh - 140px);
   display: flex;
   flex-direction: column;
 }
@@ -332,24 +227,23 @@ const handleFileChange = (event) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%; /* 确保高度跟随父元素 */
+  height: 100%;
 }
 
-/* 让表单填满剩余空间 */
 .edit-card :deep(.el-card__body) {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 20px 30px; /* 增加内边距 */
-  height: 100%; /* 确保高度跟随父元素 */
+  padding: 20px 30px;
+  height: 100%;
 }
 
 .edit-card :deep(.el-form) {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%; /* 确保高度跟随父元素 */
-  overflow: hidden; /* 防止内容溢出 */
+  height: 100%;
+  overflow: hidden;
 }
 
 .edit-card :deep(.el-form-item.is-required) {
@@ -357,15 +251,15 @@ const handleFileChange = (event) => {
   display: flex;
   flex-direction: column;
   margin-bottom: 0;
-  overflow: hidden; /* 防止内容溢出 */
+  overflow: hidden;
 }
 
 .editor-container {
   flex: 1;
   display: flex;
   gap: 20px;
-  min-height: 0; /* 防止溢出 */
-  overflow: hidden; /* 确保内容不溢出 */
+  min-height: 0;
+  overflow: hidden;
 }
 
 .editor-wrapper,
@@ -373,79 +267,22 @@ const handleFileChange = (event) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* 防止溢出 */
-  overflow-y: auto; /* 允许垂直滚动 */
-  overflow-x: hidden; /* 隐藏水平滚动条 */
-}
-
-/* 调整编辑器工具栏 */
-.editor-toolbar {
-  padding: 12px;
-  border: 1px solid #dcdfe6;
-  border-bottom: none;
-  border-radius: 4px 4px 0 0;
-  background: #f5f7fa;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.editor-toolbar .el-button {
-  padding: 8px 16px;
-  font-weight: bold;
-}
-
-.editor-toolbar .el-button-group {
-  margin-right: 12px;
-}
-
-/* 调整输入区域 */
-.editor-wrapper :deep(.el-textarea) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.editor-wrapper :deep(.el-textarea__inner) {
-  flex: 1;
-  font-family: 'Fira Code', monospace;
-  font-size: 15px;
-  line-height: 1.6;
-  padding: 20px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  resize: none; /* 禁用手动调整大小 */
-  overflow-y: auto; /* 允许垂直滚动 */
-  overflow-x: hidden; /* 隐藏水平滚动条 */
-}
-
-/* 调整预览区域 */
-.preview-wrapper {
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  padding: 20px 30px;
+  min-height: 0;
   overflow-y: auto;
-  background: #fff;
+  overflow-x: hidden;
 }
 
-.preview-content {
-  flex: 1;
-}
-
-/* 调整标题输入框 */
 .title-input :deep(.el-input__inner) {
   font-size: 1.5em;
   padding: 12px 20px;
   height: 50px;
 }
 
-/* 调整分类选择器 */
 .category-select {
   width: 240px;
   margin-right: 15px;
 }
 
-/* 调整底部按钮 */
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -460,7 +297,6 @@ const handleFileChange = (event) => {
   font-size: 1.1em;
 }
 
-/* Markdown 预览样式优化 */
 .markdown-body {
   font-size: 16px;
   line-height: 1.8;
@@ -498,20 +334,19 @@ const handleFileChange = (event) => {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* 响应式调整 */
 @media (max-width: 1200px) {
   .edit-post {
     padding: 10px;
   }
   
   .editor-container {
-    flex-direction: column; /* 小屏幕上垂直排列 */
+    flex-direction: column;
   }
   
   .editor-wrapper,
   .preview-wrapper {
     width: 100%;
-    max-height: 50vh; /* 限制高度，防止溢出 */
+    max-height: 50vh;
   }
 }
-</style> 
+</style>

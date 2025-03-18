@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <el-row class="search-row" :gutter="20">
-      <el-col :span="18" :offset="0">
+      <el-col :span="24">
         <el-input
           v-model="searchQuery"
           placeholder="搜索文章..."
@@ -11,30 +11,29 @@
           class="search-input"
         />
       </el-col>
-      <el-col :span="6">
-        <el-button 
-          type="primary" 
-          class="new-post-btn"
-          @click="$router.push('/edit')"
-        >
-          写文章
-        </el-button>
-      </el-col>
     </el-row>
 
     <el-row :gutter="20">
       <el-col :span="18">
-        <div v-if="filteredPosts.length > 0">
+        <el-skeleton :loading="loading" :rows="3" animated v-if="loading">
+          <!-- 骨架屏保持不变 -->
+        </el-skeleton>
+
+        <div v-else-if="filteredPosts.length > 0">
           <div v-for="post in filteredPosts" :key="post.id" class="post-item">
             <el-card class="kawaii-card">
-              <h2>
-                <router-link :to="'/post/' + post.id" class="post-title">
-                  {{ post.title }}
-                </router-link>
-              </h2>
+              <template #header>
+                <div class="card-header-content">
+                  <h2 class="post-title-wrapper">
+                    <router-link :to="'/post/' + post.id" class="post-title">
+                      {{ post.title }}
+                    </router-link>
+                  </h2>
+                </div>
+              </template>
               <p class="post-meta">
                 <el-tag size="small" class="kawaii-tag">{{ post.category }}</el-tag>
-                <span class="date">{{ post.date }}</span>
+                <span class="date">{{ new Date(post.date).toLocaleDateString() }}</span>
               </p>
               <p class="post-summary">{{ post.summary }}</p>
             </el-card>
@@ -44,49 +43,30 @@
       </el-col>
       
       <el-col :span="6">
-        <el-card class="category-card kawaii-card">
-          <template #header>
-            <div class="card-header">
-              <span>分类标签 (●'◡'●)</span>
-            </div>
-          </template>
-          <div class="categories">
-            <el-tag
-              v-for="category in categories"
-              :key="category"
-              class="category-tag kawaii-tag"
-            >
+        <div class="category-nav">
+          <h3 class="category-title">分类导航</h3>
+          <el-menu class="category-menu" :default-active="activeCategory" @select="handleCategorySelect">
+            <el-menu-item v-for="category in categories" :key="category" :index="category">
               {{ category }}
-            </el-tag>
-          </div>
-        </el-card>
+            </el-menu-item>
+          </el-menu>
+        </div>
       </el-col>
     </el-row>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { usePostStore } from '../stores/post'
+import { get } from '../utils/request'
 
 const searchQuery = ref('')
 const postStore = usePostStore()
-
-// 使用 store 中的数据
-const posts = computed(() => postStore.posts)
-const categories = computed(() => postStore.categories)
-
-const filteredPosts = computed(() => {
-  if (!searchQuery.value) return posts.value
-  
-  const query = searchQuery.value.toLowerCase()
-  return posts.value.filter(post => 
-    post.title.toLowerCase().includes(query) ||
-    post.summary.toLowerCase().includes(query) ||
-    post.category.toLowerCase().includes(query)
-  )
-})
+const loading = ref(false)
+const activeCategory = ref('')
 
 const debounce = (fn, delay) => {
   let timer = null
@@ -101,145 +81,139 @@ const debounce = (fn, delay) => {
 const handleSearch = debounce(() => {
   console.log('Searching for:', searchQuery.value)
 }, 300)
+
+const fetchPosts = async () => {
+  loading.value = true
+  try {
+    const response = await get('/articles')
+    postStore.setPosts(response.map(post => ({
+      ...post,
+      summary: post.content.substring(0, 150) + '...'
+    })))
+  } catch (error) {
+    ElMessage.error('获取文章列表失败')
+    console.error('Error fetching posts:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchPosts()
+})
+
+const posts = computed(() => postStore.posts)
+const categories = computed(() => postStore.categories)
+
+const filteredPosts = computed(() => {
+  let filtered = posts.value
+  if (activeCategory.value) {
+    filtered = filtered.filter(post => post.category === activeCategory.value)
+  }
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(post => 
+      post.title.toLowerCase().includes(query) ||
+      post.summary.toLowerCase().includes(query) ||
+      post.category.toLowerCase().includes(query)
+    )
+  }
+  return filtered
+})
+
+const handleCategorySelect = (category) => {
+  activeCategory.value = activeCategory.value === category ? '' : category
+}
 </script>
 
 <style scoped>
 .home {
-  animation: fadeIn 0.5s ease-out;
-  overflow-x: hidden;
-  box-sizing: border-box;
+  padding: 20px;
+  background: #F1F8FF;
+  background-image: url('@/assets/bg-pattern.png');
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.kawaii-input :deep(.el-input__inner) {
-  border-radius: 20px;
-  border: 2px solid #3A9AD9;
-  transition: all 0.3s ease;
-}
-
-.kawaii-input :deep(.el-input__inner:focus) {
-  border-color: #007BB5;
-  box-shadow: 0 0 10px rgba(79, 195, 247, 0.2);
-}
-.post-item{
+.search-row {
   margin-bottom: 20px;
 }
-.kawaii-card {
-  border-radius: 15px;
+
+.search-input {
+  border-radius: 20px;
   border: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(58, 154, 217, 0.15);
+  box-shadow: 0 2px 12px rgba(79, 195, 247, 0.1);
+  transition: box-shadow 0.3s;
+}
+
+.search-input:focus {
+  box-shadow: 0 4px 16px rgba(79, 195, 247, 0.2);
+}
+
+.kawaii-card {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(79, 195, 247, 0.1);
+  transition: transform 0.3s;
 }
 
 .kawaii-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(58, 154, 217, 0.2);
+}
+
+.card-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.post-title-wrapper {
+  margin: 0;
 }
 
 .post-title {
-  color: #3A9AD9;
+  font-size: 1.5em;
+  color: #4FC3F7;
+  font-family: 'Comic Sans MS', cursive;
   text-decoration: none;
-  font-size: 1.4em;
-  font-weight: bold;
-  transition: color 0.3s ease;
 }
 
 .post-title:hover {
-  color: #007BB5;
-}
-
-.kawaii-tag {
-  background: #F1F8FF;
-  border-color: #3A9AD9;
-  color: #3A9AD9;
-  border-radius: 12px;
-  padding: 0 12px;
-  transition: all 0.3s ease;
-}
-
-.kawaii-tag:hover {
-  background: #3A9AD9;
-  color: white;
+  text-decoration: underline;
 }
 
 .post-meta {
-  margin: 12px 0;
-  color: #3A9AD9;
+  margin: 10px 0;
+  color: #666;
+}
+
+.kawaii-tag {
+  background: linear-gradient(45deg, #4FC3F7, #81D4FA);
+  color: white;
 }
 
 .date {
   margin-left: 10px;
-  color: #81D4FA;
 }
 
 .post-summary {
-  color: #666;
-  line-height: 1.8;
+  color: #333;
+  line-height: 1.6;
 }
 
-.category-card {
-  background: rgba(255, 255, 255, 0.9);
+.category-nav {
+  padding: 20px;
+  background: #F1F8FF;
+  background-image: url('@/assets/bg-pattern.png');
 }
 
-.card-header {
+.category-title {
+  margin-bottom: 20px;
+  font-size: 1.5em;
   color: #4FC3F7;
-  font-size: 1.2em;
-  font-weight: bold;
+  font-family: 'Comic Sans MS', cursive;
 }
 
-.categories {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.category-menu {
+  background: #F1F8FF;
+  border: none;
 }
-
-.search-row {
-  margin-bottom: 24px;
-}
-
-.search-input {
-  width: 100%;
-  margin-top: 20px;
-}
-
-.search-input :deep(.el-input__wrapper) {
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.search-input :deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px #4FC3F7;
-}
-
-.search-input :deep(.el-input__inner) {
-  font-size: 14px;
-  height: 40px;
-}
-
-.new-post-btn {
-  width: 100%;
-  margin-top: 20px;
-  background-color: #3A9AD9;
-  border-color: #3A9AD9;
-}
-
-.new-post-btn:hover {
-  background-color: #007BB5;
-  border-color: #007BB5;
-}
-
-img, video {
-  max-width: 100%;
-}
-
-.clearfix::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-</style> 
+</style>
