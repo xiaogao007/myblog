@@ -39,7 +39,7 @@
         </el-form-item>
 
         <el-form-item label="文章内容 (Markdown)">
-          <div style="width: 100%; height: 600px;" id="vditor"></div>
+          <div style="width: 100%!important; height: 600px;" id="vditor"></div>
         </el-form-item>
 
         <el-form-item>
@@ -130,6 +130,11 @@ const showImageUploader = ref(false)
 let vditorInstance
 
 onMounted(() => {
+  // 如果是新增文章，先清除缓存
+  if (!isEdit.value) {
+    localStorage.removeItem('vditor')
+  }
+  
   vditorInstance = new Vditor('vditor', {
     height: 600,
     toolbarConfig: {
@@ -137,6 +142,11 @@ onMounted(() => {
     },
     cache: {
       id: 'vditor',
+    },
+    after: () => {
+      if (isEdit.value && postForm.value.content) {
+        vditorInstance.setValue(postForm.value.content)
+      }
     },
     preview: {
       markdown: {

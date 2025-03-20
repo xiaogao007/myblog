@@ -213,7 +213,7 @@ const replyToComment = (comment) => {
 
 <style scoped>
 .post-detail {
-  max-width: 800px;
+  max-width: 60%;
   margin: 0 auto;
   padding: 20px;
   background: #F1F8FF;
@@ -242,6 +242,11 @@ const replyToComment = (comment) => {
   background: rgba(255, 255, 255, 0.95);
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(79, 195, 247, 0.1);
+  transition: all 0.3s ease;
+}
+
+.comment-section:hover {
+  box-shadow: 0 4px 15px rgba(79, 195, 247, 0.2);
 }
 
 .comment-header {
@@ -257,8 +262,13 @@ const replyToComment = (comment) => {
 
 .comment-input {
   margin-bottom: 15px;
-  border-radius: 20px;
-  border: 2px solid #4FC3F7;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.comment-input:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(79, 195, 247, 0.2);
 }
 
 .comment-form-footer {
@@ -274,7 +284,15 @@ const replyToComment = (comment) => {
   display: flex;
   margin-bottom: 20px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #eef2f7;
+  transition: all 0.3s ease;
+  animation: slideIn 0.5s ease;
+}
+
+.comment-item:hover {
+  background: rgba(79, 195, 247, 0.05);
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .comment-avatar {
@@ -313,16 +331,39 @@ const replyToComment = (comment) => {
   margin-top: 15px;
   margin-left: 20px;
   padding-left: 20px;
-  border-left: 2px solid #eee;
+  border-left: 2px solid #e8f4ff;
 }
 
 .reply-item {
   margin-bottom: 15px;
-  padding-bottom: 15px;
-  border-bottom: 1px dashed #eee;
+  padding: 10px;
+  border-radius: 6px;
+  background: rgba(248, 250, 252, 0.6);
+  transition: all 0.3s ease;
+  animation: fadeIn 0.5s ease;
 }
 
-.reply-item:last-child {
-  border-bottom: none;
+.reply-item:hover {
+  background: rgba(248, 250, 252, 0.9);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 </style> 

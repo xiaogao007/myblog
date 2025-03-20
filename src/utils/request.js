@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { message } from 'antd';
-
 // 创建 axios 实例
 const service = axios.create({
+  // 根据环境变量设置 baseURL
   baseURL: '/api',  // Changed from http://123.56.165.6:3001 to /api
   timeout: 15000,
   headers: {

@@ -5,7 +5,7 @@ node_modules
 # 构建输出
 dist
 dist-ssr
-
+dist.zip
 # 本地环境文件
 *.local
 .env.local

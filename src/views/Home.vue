@@ -35,7 +35,7 @@
                 <el-tag size="small" class="kawaii-tag">{{ post.category }}</el-tag>
                 <span class="date">{{ new Date(post.date).toLocaleDateString() }}</span>
               </p>
-              <p class="post-summary">{{ post.summary }}</p>
+              <!-- <p class="post-summary">{{ post.summary }}</p> -->
             </el-card>
           </div>
         </div>
